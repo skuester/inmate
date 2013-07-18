@@ -1,0 +1,55 @@
+#!/bin/bash
+
+# Build System influenced heavily by redo.
+
+# By default, no output coloring.
+green=""
+bold=""
+plain=""
+
+if [ -n "$TERM" -a "$TERM" != "dumb" ] && tty <&2 >/dev/null 2>&1; then
+	green="$(printf '\033[32m')"
+	bold="$(printf '\033[1m')"
+	plain="$(printf '\033[m')"
+fi
+
+_dirsplit()
+{
+	base=${1##*/}
+	dir=${1%$base}
+}
+
+dirname()
+(
+	_dirsplit "$1"
+	dir=${dir%/}
+	echo "${dir:-.}"
+)
+
+_dirsplit "$0"
+
+_iterate()
+{
+	echo "iterating over: $source"
+	_dirsplit $source
+	echo $dir
+	echo $base
+}
+
+_run()
+{
+	if [ -z $1 ]; then source=$PWD
+	else source=$1; fi
+
+	if [ -d $source ]; then 
+		_iterate $source
+	fi
+
+	# ignore files starting with _
+	# use file.txt.rule
+	# _default.txt.rule
+	# _all.rule ?
+	# _default.rule
+}
+
+_run $1
