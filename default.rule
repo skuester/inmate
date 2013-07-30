@@ -1,0 +1,8 @@
+#!/bin/sh
+
+# The global default rule for a file picked up by inmate
+
+src=$1
+target_dir=$2
+
+cp "$src" "$target_dir/$src"

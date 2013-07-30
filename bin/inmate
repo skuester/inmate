@@ -1,0 +1,37 @@
+#!/bin/sh
+source "$HOME/.inmate/common.lib"
+
+# # # # # #
+# INMATE
+# Build System influenced heavily by redo.
+# # # # # #
+
+# source directory
+src=$(_abspath $1); [ $src ] || src="$PWD"
+# TODO: make configurable
+target="$root/_site"
+
+# find a controller who can build this src directory
+_find_controller()
+{
+	dir=$1
+	while :; do
+		_dirsplit $dir
+		# $dir is now the parent directory
+
+		controller="$dir/$base.$RULE"
+		[ -f $controller ] && return
+
+		controller="$dir/_directory.rule"
+		[ -f $controller ] && return
+
+		controller="$INMATE/directory.rule"
+
+		[ $dir ] || break
+	done;
+}
+
+_find_controller $src
+$controller $src $target
+# echo controller is: $green"$controller"$plain
+

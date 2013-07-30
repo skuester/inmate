@@ -1,0 +1,56 @@
+#!/bin/sh
+source "$HOME/.inmate/common.lib"
+
+src=$1 target_root=$2
+
+for file in "$src"/*; do
+	# ignore hidden files (beginning with _)
+	if [[ ${file#$1/_} = $file ]]; then
+		[ -d $file ] && inmate $file $target_root
+		[ -f $file ] && _call_rule $file $target_root
+	fi
+done
+
+_find_rule_pwd()
+{
+	rule="$PWD/_default.$1.$RULE"
+	while :; do
+		rule="$PWD/_default."${rule#_default.*.}
+		[ -e "$rule" -o "$rule" = "$PWD/_default.$RULE" ] && break
+	done
+}
+
+_find_rule()
+{
+	filepath=$1
+	_dirsplit $filepath
+
+	rule="$dir/$base.rule"
+	[ -e $rule ] && return
+
+	cd $dir
+	while :; do
+		_find_rule_pwd $base
+		[ -e $rule ] && return
+		[ $PWD = "/" ] && break
+		cd ..
+	done;
+
+	rule="$INMATE/default.rule"
+}
+
+
+_call_rule()
+{
+	local line1
+	set -e
+	_find_rule $1
+
+	read line1 <"$rule" || true
+	cmd=${line1#"#!/"}
+	if [ "$cmd" != "$line1" ]; then
+		/$cmd "$rule" "$@"
+	else
+		:; . "$rule"
+	fi
+}
