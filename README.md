@@ -3,7 +3,11 @@ Inmate
 
 A build system where you make the rules.
 
-# Basic Idea
+
+
+
+Big Picture
+-----------
 The main inmate script doesn't do much at all - It simply looks for a controller that can build the given directory. Most of the heavy lifting is done by the default controller is no custom controllers are found. Custom controllers are found by filename convention:
     
     project/
@@ -23,16 +27,20 @@ The main inmate script doesn't do much at all - It simply looks for a controller
 
 Directory rules receive two arguments:
 
-    1. the source directory path, relative to the PWD `some/dir`
-    2. the build target root directory `/project/_built`
+1. the source directory path, relative to the PWD `some/dir`
+2. the build target root directory `/project/_built`
 
 Allowing for custom rules for an entire directory allows us to treat a collection of files as a whole. Something that a _default.rule cannot do for us.
 
-## Default Controller - directory.rule
-As in redo, by default inmate controller looks for executable rules to build each file. Each rule receives two arguments:
 
-    1. the source file path, relative to the PWD: `some/file.ext`
-    2. the target root directory `/project/_built`
+
+
+Default Controller
+------------------
+A controller is a rule for an entire directory. As in redo, the default inmate controller looks for executable rules to build each file. Each rule receives two arguments:
+
+1. the source file path, relative to the PWD: `some/file.ext`
+2. the target root directory `/project/_built`
 
 File rules are looked up in the following order. (Files beginning with a `_` are ignored):
 
@@ -49,8 +57,16 @@ File rules are looked up in the following order. (Files beginning with a `_` are
     # finally, if no rule is found
     INMATE/default.rule
 
-## Default Rule
+
+
+
+Default Rule
+------------
 By default, any file not beginning with an _ will be copied to the target build directory.
+
+
+
+
 
 
 ### TODO:
