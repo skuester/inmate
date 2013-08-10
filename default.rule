@@ -1,8 +1,12 @@
 #!/bin/sh
-
+source /usr/local/inmate/lib/common.sh
 # The global default rule for a file picked up by inmate
 
-src=$1
-target_dir=$2
+src=$1 target_root=$2
+# echo 'src: '$src
+# echo "target: $target_root"
 
-cp "$src" "$target_dir/$src"
+built_path="$target_root/$src"
+_dirsplit "$built_path"
+mkdir -p "$dir"
+cp "$src" "$built_path"

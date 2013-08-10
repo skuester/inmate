@@ -1,5 +1,5 @@
 #!/bin/sh
-source "$HOME/.inmate/common.lib"
+source /usr/local/inmate/lib/common.sh
 
 # # # # # #
 # INMATE
@@ -7,27 +7,30 @@ source "$HOME/.inmate/common.lib"
 # # # # # #
 
 # source directory
-src=$(_abspath $1); [ $src ] || src="$PWD"
+src=$PWD; [ -n $1 ] && src="$src/$1"
+
 # TODO: make configurable
-target="$root/_site"
+target="$PWD/_built"
 
 # find a controller who can build this src directory
 _find_controller()
 {
 	dir=$1
+	controller=$INMATE_DEFAULT_CONTROLLER
+
 	while :; do
+		[[ $dir = $PWD ]] && break
+
 		_dirsplit $dir
 		# $dir is now the parent directory
 
 		controller="$dir/$base.$RULE"
 		[ -f $controller ] && return
 
-		controller="$dir/_directory.rule"
+		controller="$dir/_directory.$RULE"
 		[ -f $controller ] && return
 
-		controller="$INMATE/directory.rule"
-
-		[ $dir ] || break
+		controller=$INMATE_DEFAULT_CONTROLLER
 	done;
 }
 

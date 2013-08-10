@@ -1,8 +1,12 @@
 #!/bin/sh
 
 # default rule file extension
-INMATE="$HOME/.inmate"
+INMATE="/usr/local/inmate"
 RULE="rule"
+USER_INMATE="$HOME/.inmate"
+
+INMATE_DEFAULT_CONTROLLER="$INMATE/directory.rule"
+INMATE_DEFAULT_RULE="$INMATE/default.rule"
 
 # By default, no output coloring.
 green=""

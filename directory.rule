@@ -1,42 +1,37 @@
 #!/bin/sh
-source "$HOME/.inmate/common.lib"
-
-src=$1 target_root=$2
-
-for file in "$src"/*; do
-	# ignore hidden files (beginning with _)
-	if [[ ${file#$1/_} = $file ]]; then
-		[ -d $file ] && inmate $file $target_root
-		[ -f $file ] && _call_rule $file $target_root
-	fi
-done
+source "/usr/local/inmate/lib/common.sh"
 
 _find_rule_pwd()
 {
-	rule="$PWD/_default.$1.$RULE"
+	# echo "finding rule pwd $1"
+	directory=${1%/}
+	basename=$2
+	rule_base="_default.$basename.$RULE"
+	rule="$directory/$rule_base"
 	while :; do
-		rule="$PWD/_default."${rule#_default.*.}
-		[ -e "$rule" -o "$rule" = "$PWD/_default.$RULE" ] && break
+		rule_base="_default."${rule_base#_default.*.}
+		rule="$directory/$rule_base"
+		[ -e "$rule" -o "$rule" = "$directory/_default.$RULE" ] && break
 	done
 }
 
 _find_rule()
 {
-	filepath=$1
-	_dirsplit $filepath
+	# echo "find rule $1"
+	_dirsplit $file
 
 	rule="$dir/$base.rule"
 	[ -e $rule ] && return
 
-	cd $dir
 	while :; do
-		_find_rule_pwd $base
+		# echo "looking in $dir ..."
+		_find_rule_pwd $dir $base
 		[ -e $rule ] && return
-		[ $PWD = "/" ] && break
-		cd ..
+		[ $dir = $PWD ] && break
+		dir=${dir%/*}
 	done;
 
-	rule="$INMATE/default.rule"
+	rule=$INMATE_DEFAULT_RULE
 }
 
 
@@ -49,8 +44,25 @@ _call_rule()
 	read line1 <"$rule" || true
 	cmd=${line1#"#!/"}
 	if [ "$cmd" != "$line1" ]; then
-		/$cmd "$rule" "$@"
+		/$cmd "$rule" $@
 	else
 		:; . "$rule"
 	fi
 }
+
+# src is the folder I'm building
+src=${1%/} 
+# target root is where it's all going.
+target_root="$2"
+[ -d "$target_root" ] ||  mkdir -p "$target_root"
+
+for file in "$src"/*; do
+	# ignore hidden files (beginning with _)
+	if [[ ${file#$src/_} = $file ]]; then
+		relative_file=${file##$PWD/}
+		[ -d $file ] && inmate $relative_file $target_root
+		[ -f $file ] && _call_rule $relative_file $target_root
+	fi
+done
+
+echo "${green}built $src$plain"
