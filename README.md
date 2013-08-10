@@ -22,6 +22,7 @@ The main inmate script doesn't do much at all - It simply looks for a controller
 - Finally, the `images` directory will use `images.rule`
 
 Directory rules receive two arguments:
+
     1. the source directory path, relative to the PWD `some/dir`
     2. the build target root directory `/project/_built`
 
@@ -29,6 +30,7 @@ Allowing for custom rules for an entire directory allows us to treat a collectio
 
 ## Default Controller - directory.rule
 As in redo, by default inmate controller looks for executable rules to build each file. Each rule receives two arguments:
+
     1. the source file path, relative to the PWD: `some/file.ext`
     2. the target root directory `/project/_built`
 
